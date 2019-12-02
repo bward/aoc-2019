@@ -1,0 +1,1 @@
+let (<*>) xs ys = [for x in xs do for y in ys -> (x, y)]
