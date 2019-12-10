@@ -37,16 +37,28 @@ let partTwo () =
         run states 0)
     |> List.max
 
+
+type MyType = 
+    | Run of int64
+    | Done
+
 let intcodeActor startState =
     MailboxProcessor.Start(fun inbox ->
         let rec loop state =
             async {
-                let! (msg, channel: AsyncReplyChannel<int64>) = inbox.Receive()
-                let newState = stepState {getState state with inputs = msg :: (getState state).inputs}
-                match newState with
-                | Running s | Terminated s->
-                    List.head s.outputs |> channel.Reply
-                    return! loop newState
+                let! (msg, channel: AsyncReplyChannel<MyType>) = inbox.Receive()
+                let newState = stepState {getState state with inputs = i :: (getState state).inputs}
+                match msg with
+                | Run i -> 
+                    match newState with
+                    | Running s -> 
+                        List.head s.outputs
+                        |> Run
+                        |> channel.Reply
+                    | Terminated _ -> channel.Reply Done
+                | Done -> ()
+
+                return! loop newState
             }
 
         loop startState
@@ -56,8 +68,11 @@ let goodPartTwo () =
     let actors =
         [5L; 6L; 7L; 8L; 9L]
         |> List.map (fun p -> Running {idx = 0; inputs = [p]; outputs = []; instructions = Array.copy input; relativeBase = 0} |> intcodeActor)
+        |> Seq.ofList
         
-    actors.[0].PostAndReply(fun rc -> 0L, rc)
+    Seq.scan (fun (s: MyType) (a: MailboxProcessor<MyType * AsyncReplyChannel<MyType>>) ->
+        a.PostAndReply(fun rc -> s, rc)
+    ) (Run 0L) (cycle actors)
     
 partOne () |> printfn "%A"
 partTwo () |> printfn "%A"
