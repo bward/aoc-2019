@@ -2,7 +2,6 @@
 #load "intcode.fsx"
 
 open System.IO
-open Common
 open IntCode
  
 let input = File.ReadLines("input\\9.txt") |> Seq.head |> (fun x -> x.Split(',')) |> Array.map int64

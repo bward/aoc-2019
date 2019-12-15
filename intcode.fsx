@@ -46,10 +46,11 @@ let rec stepState (state: State) =
         | i :: is ->
             Array.set state.instructions (getOut x) (int64 i)
             stepState {state with idx = state.idx + 2; inputs = is}
-        | [] -> invalidArg "inputs" "out of input values"
+        | [] -> Running state
 
     let output x =
-        Running {state with idx = state.idx + 2; outputs = get x :: state.outputs}
+        // Running {state with idx = state.idx + 2; outputs = get x :: state.outputs}
+        stepState {state with idx = state.idx + 2; outputs = get x :: state.outputs}
 
     let jumpIf condition x y =
         if (get x) |> condition
