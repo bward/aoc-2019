@@ -82,8 +82,11 @@ let rec runState (state: State) =
     | Running s -> runState s
     | Terminated s -> s
 
+let initState instructions inputs =
+    {idx = 0; inputs = inputs; outputs = []; instructions = Array.append (Array.copy instructions) (Array.create 10000 0L); relativeBase = 0}
+
 let run (inputs: int64 list) (instructions: int64[]) =
-    runState {idx = 0; inputs = inputs; outputs = []; instructions = Array.append (Array.copy instructions) (Array.create 1000 0L); relativeBase = 0}
+    runState {idx = 0; inputs = inputs; outputs = []; instructions = Array.append (Array.copy instructions) (Array.create 10000 0L); relativeBase = 0}
 
 let terminated runState =
     match runState with

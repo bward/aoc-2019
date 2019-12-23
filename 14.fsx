@@ -43,8 +43,7 @@ let oreForFuel fuel =
     Map.empty |> Map.add "FUEL" fuel |> react
 
 let partOne = oreForFuel 1L
-
-let partTwo = binarySearch (fun x -> oreForFuel x < 1000000000000L) 0L 100000000L
+let partTwo = (binarySearch (fun x -> oreForFuel x > 1000000000000L) 0L 100000000L) - 1L
 
 partOne |> printfn "%A"
 partTwo |> printfn "%A"

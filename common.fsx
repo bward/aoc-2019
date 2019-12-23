@@ -26,9 +26,9 @@ let rec binarySearch pred lower upper =
     then upper
     else 
         let midpoint = (upper + lower) / 2L
-        if pred midpoint
-        then binarySearch pred midpoint upper
-        else binarySearch pred lower (midpoint - 1L)
+        if pred midpoint |> not
+        then binarySearch pred (midpoint + 1L) upper
+        else binarySearch pred lower midpoint
 
 module Queue =
     type Queue<'a> =
@@ -48,4 +48,21 @@ module Queue =
             let bs = List.rev fs
             bs.Head, Queue([], bs.Tail)
 
+    let length q =
+        match q with
+        | Queue (x, y) -> (List.length x) + (List.length y)
+
 let add2 (a, b) (c, d) = (a + c, b + d)
+
+// Fast modular exponentiation
+let expMod a b n =
+    let rec loop a b c =
+        if b = 0I then c else
+            loop (a * a % n) (b >>> 1) (if b &&& 1I = 0I then c else c * a % n)
+    loop a b 1I
+
+// Fermat's Little Theorem
+let inverseModP p n =
+    expMod n (p - 2I) p
+
+let inline (|?) (a: 'a option) (b: 'a option) = if a.IsSome then a else b
