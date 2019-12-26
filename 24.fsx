@@ -1,6 +1,7 @@
 #load "common.fsx"
 
 open System.IO
+open Common
 
 let input = 
     File.ReadLines("input\\24.txt")
@@ -53,8 +54,6 @@ let expand world =
 
 let neighboursInLevel (d, x, y) = [(d, x-1, y); (d, x+1, y); (d, x, y-1); (d, x, y+1)]
 
-let addIf condition vs list = if condition then vs @ list else list
-
 let recursiveNeighbours (d, y, x) = 
         if (y, x) = (2, 2)
         then []
@@ -69,13 +68,11 @@ let recursiveNeighbours (d, y, x) =
             |> addIf (x = 1 && y = 2) [for y in 0..4 do yield (d+1, y, 0)]
             |> addIf (x = 3 && y = 2) [for y in 0..4 do yield (d+1, y, 4)]
 
-let partOne input = 
-    let rec run seen world =
-        if Set.contains world seen
-        then world |> biodiversity
-        else run (seen |> Set.add world) (world |> step neighboursInLevel)
+let rec partOne seen world = 
+    if Set.contains world seen
+    then world |> biodiversity
+    else partOne (seen |> Set.add world) (world |> step neighboursInLevel)
     
-    run Set.empty input
 
 let partTwo input =
     [1..200]
@@ -85,5 +82,5 @@ let partTwo input =
     |> Map.filter (fun _ v -> v = "#")
     |> Map.count
  
-input |> partOne |> printfn "%A"
+input |> partOne Set.empty |> printfn "%A"
 input |> partTwo |> printfn "%A"

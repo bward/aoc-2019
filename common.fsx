@@ -66,3 +66,5 @@ let inverseModP p n =
     expMod n (p - 2I) p
 
 let inline (|?) (a: 'a option) (b: 'a option) = if a.IsSome then a else b
+
+let inline addIf condition vs list = if condition then vs @ list else list
